@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import ReactDOM from "react-dom";
+// import ReactDOM from "react-dom";
 
 import Moon from './connection/Moon';
 
@@ -17,7 +17,7 @@ class Checkbox extends Component {
             isChecked: false
         };
 
-        this.handleCheck = this.handleCheck.bind(this);
+        // this.handleCheck = this.handleCheck.bind(this);
         this.getProv = this.getProv.bind(this);
     }
 
@@ -31,9 +31,10 @@ class Checkbox extends Component {
 
 
     ////////////////////////////////////////
-    handleCheck() {
-        this.setState({isChecked: !this.state.isChecked});
-    }
+    // handleCheck(e) {
+    //     this.setState({isChecked: !this.state.isChecked});
+    //     console.log("🤬"+e.target.value);
+    // }
     ////////////////////////////////////////
 
     componentWillMount() {
@@ -53,13 +54,13 @@ class Checkbox extends Component {
                 this.setState({
                     prov: provArray });
 
-                console.log("🐷" + JSON.stringify(this.state.prov));
+                // console.log("🐷" + JSON.stringify(this.state.prov));
 
             })
-            // .catch(err => {
-            //     this.disabledInput();
-            //     console.log(JSON.stringify(err));
-            // })
+        // .catch(err => {
+        //     this.disabledInput();
+        //     console.log(JSON.stringify(err));
+        // })
     }
 
     // Get data by Province
@@ -67,14 +68,14 @@ class Checkbox extends Component {
     getProv(e){
 
         this.setState({isLoading:true})
+        this.setState({isChecked: !this.state.isChecked});
+        console.log("🤬"+e.target.value);
 
         e.persist();
 
-        console.log("🍒" + JSON.stringify(this.state.prov));
-
         this.state.prov.forEach(prov => {
 
-            if(this.state.isChecked === true ){
+            if( this.state.isChecked === false && prov.name === e.target.value ){
 
                 moon
                     .get(`api/area/search/citylist/byareaid/${prov.id}`)
@@ -82,26 +83,27 @@ class Checkbox extends Component {
                         this.setState({isLoading:false})
                         // this.state.areaList.push(res.city);
 
+                        // console.log("🥝" + JSON.stringify(res.data));
                         let arrayCity = [];
                         res.data.map( eachCity => {
-                            console.log(eachCity);
-                            return arrayCity.push(eachCity.city);
+                            return arrayCity.push(eachCity.city)
                         });
 
+
                         this.setState({areaList:arrayCity});
-                        console.log("🐼" + JSON.stringify(this.state.areaList));
+                        console.log(this.state.areaList.length);
+                        console.log("🍤" + this.state.areaList);
                     })
 
-                    // .catch(err => {
-                    //     this.disabledInput();
-                    //     this.setState({isLoading:false})
-                    //     console.log(JSON.stringify(err));
-                    // })
+                // .catch(err => {
+                //     this.disabledInput();
+                //     this.setState({isLoading:false})
+                //     console.log(JSON.stringify(err));
+                // })
 
             } else return 0
 
         })
-        // console.log("🐼" + JSON.stringify(this.state.areaList));
     };
     ////////////////////////////////////////
 
@@ -113,18 +115,22 @@ class Checkbox extends Component {
                 <div>
 
                     {this.state.prov.map((prov, index) =>
-                    <div onChange={this.getProv}>
-                        <input type="checkbox" name="areaList" key={index} value='' onChange={this.handleCheck} defaultChecked={this.state.checked} />{prov.name}
+                        <div onChange={this.getProv}>
+                            <label key={index}>
+                                <input type="checkbox" name="areaList" key={index} value={prov.name} defaultChecked={this.state.isChecked} />
+                                {prov.name}
+                                <br/>
+                            </label>
 
-                        {this.state.areaList.map((city, index) =>
-                        <div>
-                            <input type="checkbox" key={index}/>{city}
+                            {this.state.areaList.map((city, index) =>
+                                <label>
+                                    <input type="checkbox" value={city} key={index} checked={this.state.isChecked}/>
+                                    {city}
+                                    <br/>
+                                </label>
+                            )}
                         </div>
-                        )}
-
-                    </div>
                     )}
-
 
                 </div>
             </div>
