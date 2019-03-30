@@ -28,12 +28,10 @@ class CoveredAreaCheckbox extends Component {
 
                 let provinces = [Object.assign({}, this.state.provinces)];
 
-                // let newAreaArray = [];
-
                 for(let i = 0; i < res.data.length; i++) {
                     let obj = {};
-                    obj['province'] = res.data[i]._id;
-                    obj['cities'] = res.data[i].name;
+                    obj['province.id'] = res.data[i]._id;
+                    obj['province.name'] = res.data[i].name;
                     provinces.push(obj);
                 }
 
@@ -41,7 +39,7 @@ class CoveredAreaCheckbox extends Component {
                 this.setState({
                     provinces: provinces });
 
-                console.log("🐷" + JSON.stringify(this.state.provinces));
+                console.log("🐷" + JSON.stringify(this.state.provinces)); //get province info about id and name
 
             })
         // .catch(err => {
