@@ -3,6 +3,9 @@ import React, { Component } from 'react';
 
 import Moon from './connection/Moon';
 
+
+import ProvinceCheckBox from './ProvinceCheckbox';
+
 const moon = new Moon();
 
 class Checkbox extends Component {
@@ -67,15 +70,16 @@ class Checkbox extends Component {
     ////////////////////////////////////////
     getProv(e){
 
-        this.setState({isLoading:true})
+        // this.setState({isLoading:true})
         this.setState({isChecked: !this.state.isChecked});
         console.log("🤬"+e.target.value);
+        console.log("🍰" + e.target.id);
 
         e.persist();
 
         this.state.prov.forEach(prov => {
 
-            if( this.state.isChecked === false && prov.name === e.target.value ){
+            if( prov.name === e.target.value ){
 
                 moon
                     .get(`api/area/search/citylist/byareaid/${prov.id}`)
@@ -83,14 +87,19 @@ class Checkbox extends Component {
                         this.setState({isLoading:false})
                         // this.state.areaList.push(res.city);
 
-                        // console.log("🥝" + JSON.stringify(res.data));
+                        console.log("🥝" + JSON.stringify(res.data));
+
                         let arrayCity = [];
                         res.data.map( eachCity => {
-                            return arrayCity.push(eachCity.city)
+                            return arrayCity.push(eachCity.city);
                         });
 
+                        if(prov.id === e.target.id) {
+                            this.setState({areaList:arrayCity});
+                        }
 
-                        this.setState({areaList:arrayCity});
+
+
                         console.log(this.state.areaList.length);
                         console.log("🍤" + this.state.areaList);
                     })
@@ -114,24 +123,35 @@ class Checkbox extends Component {
             <div className='App'>
                 <div>
 
-                    {this.state.prov.map((prov, index) =>
-                        <div onChange={this.getProv}>
-                            <label key={index}>
-                                <input type="checkbox" name="areaList" key={index} value={prov.name} defaultChecked={this.state.isChecked} />
-                                {prov.name}
-                                <br/>
-                            </label>
+                    {/*{this.state.prov.map((prov, index) =>*/}
+                        {/*<div onChange={this.getProv}>*/}
+                            {/*<ul key={index}>*/}
+                                {/*<li>*/}
+                                    {/*<input type="checkbox" name="areaList" key={index} id={prov.id} value={prov.name} defaultChecked={this.state.isChecked} />*/}
+                                    {/*{prov.name}*/}
+                                    {/*<ul>*/}
+                                        {/*<li>*/}
+                                            {/*{this.state.areaList.map((city, index) =>*/}
+                                                {/*<label>*/}
+                                                    {/*<input type="checkbox" key={index}  checked={this.state.isChecked}/>*/}
+                                                    {/*{city}*/}
+                                                    {/*<br/>*/}
+                                                {/*</label>*/}
+                                            {/*)}*/}
+                                        {/*</li>*/}
+                                    {/*</ul>*/}
+                                {/*</li>*/}
+                                {/*<br/>*/}
+                            {/*</ul>*/}
 
-                            {this.state.areaList.map((city, index) =>
-                                <label>
-                                    <input type="checkbox" value={city} key={index} checked={this.state.isChecked}/>
-                                    {city}
-                                    <br/>
-                                </label>
-                            )}
-                        </div>
-                    )}
+                        {/*</div>*/}
+                    {/*)}*/}
 
+
+                <ProvinceCheckBox
+                    prov = {this.state.prov}
+                    areaList = {this.state.areaList}
+                />
                 </div>
             </div>
         );
