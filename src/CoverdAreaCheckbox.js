@@ -9,42 +9,34 @@ class CoveredAreaCheckbox extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            provinces:[
-                {
-                    province: "",
-                    cities: []
-                }
-            ],
+            provinces: [],
             isChecked: false
         };
 
         this.getCities = this.getCities.bind(this);
     }
 
-    componentWillMount() {
+    componentDidMount() {
         moon
             .get('api/area/all')
             .then(res =>{
 
-                let provinces = [];
+                const provinces = [];
 
                 for(let i = 0; i < res.data.length; i++) {
-                    let obj = {
-                        province: {},
-                        cities: []
-                    };
-                    obj.province = { id: res.data[i]._id, name: res.data[i].name };
-                    provinces.push(obj);
+                    provinces.push({
+                        id: res.data[i]._id,
+                        name: res.data[i].name
+                    })
                 }
 
                 // let newProvinceArray = Object.assign({}, this.state.provinces.province);
                 // // newProvinceArray.provinces[key].province = provinces;
                 // newProvinceArray = provinces;
 
-                this.setState({ provinces: provinces });
-
-                console.log("🐷" + JSON.stringify(this.state.provinces)); //get province info about id and name
-                console.log(this.state.provinces[0]);
+                this.setState({ provinces }, () => {
+                    console.log("🐷" + JSON.stringify(this.state.provinces)); //get province info about id and name
+                })
             })
         // .catch(err => {
         //     this.disabledInput();
@@ -60,45 +52,41 @@ class CoveredAreaCheckbox extends Component {
     ////////////////////////////////////////
     getCities(e){
 
-        this.setState({isLoading:true})
-        this.setState({isChecked: !this.state.isChecked});
-        console.log("🤬"+ e.target.value);
-        console.log("🍰" + e.target.id);
-        console.log("🍥" + JSON.stringify(this.state.provinces));
-        e.persist();
+        const provId = e.target.value;
+            moon
+                .get(`api/area/search/citylist/byareaid/${provId}`)
+                .then(res => {
 
-        this.state.provinces.map(prov => {
+                    // console.log("🍊" + prov.id);　//全部のprovinceのidが入ってる
 
-            if( prov.province.name === e.target.value ){
+                    const cities = [];
 
-                moon
-                    .get(`api/area/search/citylist/byareaid/${prov.id}`)
-                    .then(res =>{
-                        this.setState({isLoading:false})
-                        // this.state.areaList.push(res.city);
+                    for(const cityData of res.data) {
+                        cities.push(cityData.city);
+                    }
 
-                        console.log("🥝" + JSON.stringify(res.data));
+                    const updatedProvinces = this.state.provinces;
 
-                        let citiesArray = [];
-                        res.data.map( eachCity => {
-                            return citiesArray.push(eachCity.city);
-                        });
+                    for(let i = 0; i < updatedProvinces.length; i++) {
+                        console.log("🍒" + JSON.stringify(updatedProvinces));
+                        // console.log("🍙" + JSON.stringify(res.data));//cities information relation between province id
 
-                        console.log(this.state.areaList.length);
-                        console.log("🍤" + this.state.areaList);
+                        console.log("🍬" + JSON.stringify(updatedProvinces[i].id));
+
+                        if(provId === updatedProvinces[i].id) {
+                            updatedProvinces[i] = Object.assign({}, this.state.provinces[i], { cities });
+                        }
+                    }
+
+                    this.setState({ provinces: updatedProvinces, }, () => {
+                        console.log("🍤" + JSON.stringify(this.state.provinces));
                     })
+                })
 
-                // .catch(err => {
-                //     this.disabledInput();
-                //     this.setState({isLoading:false})
-                //     console.log(JSON.stringify(err));
-                // })
-
-            } else return 0
-
-        })
     };
     ////////////////////////////////////////
+
+
 
 
     render() {
@@ -109,13 +97,29 @@ class CoveredAreaCheckbox extends Component {
                     {/*province = {this.state.province}*/}
                     {/*cities = {this.state.cities}*/}
                 {/*/>*/}
+                {/*{this.state.provinces.map((prov, index) => (*/}
+                    {/*<ul>*/}
+                        {/*<li><input key={index} type="checkbox" onClick={this.getCities} value={prov.name}/>{prov.name}</li>*/}
+                        {/*<br/>*/}
+
+                        {/*{prov.cities.map((cities, index) => (*/}
+                            {/*<ul>*/}
+                                {/*<li><input key={index} type="checkbox" onClick={this.getCities} value={cities}/>{cities}</li>*/}
+                                {/*<br/>*/}
+                            {/*</ul>*/}
+                        {/*))}*/}
+
+                    {/*</ul>*/}
+                {/*))}*/}
+
                 {this.state.provinces.map((prov, index) => (
                     <label>
-                        <input key={index} type="checkbox" onClick={this.getCities} value={prov.province.name}/>{prov.province.name}
+                        <input type="checkbox" key={index} value={prov.id} onClick={this.getCities}/>{prov.name}
                         <br/>
+                        <input type="checkbox" key={index} />
                     </label>
-                    )
-                )}
+                ))}
+
             </div>
         );
     }
