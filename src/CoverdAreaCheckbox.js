@@ -81,6 +81,7 @@ class CoveredAreaCheckbox extends Component {
                     this.setState({ provinces: updatedProvinces, }, () => {
                         console.log("🍤" + JSON.stringify(this.state.provinces));
                     })
+
                 })
 
     };
@@ -90,6 +91,7 @@ class CoveredAreaCheckbox extends Component {
 
 
     render() {
+
         return(
             <div>
                 {/*<ProvinceCheckbox*/}
@@ -112,14 +114,34 @@ class CoveredAreaCheckbox extends Component {
                     {/*</ul>*/}
                 {/*))}*/}
 
-                {this.state.provinces.map((prov, index) => (
-                    <label>
-                        <input type="checkbox" key={index} value={prov.id} onClick={this.getCities}/>{prov.name}
-                        <br/>
-                        <input type="checkbox" key={index} />
-                    </label>
-                ))}
+                {this.state.provinces.map((prov, index) => {
+                    return (
+                        <ul>
+                            <li>
+                                <input type="checkbox" key={index} value={prov.id} onClick={this.getCities}/>{prov.name}
 
+
+                                {prov.cities ? (
+                                    prov.cities.map((city, index) => {
+                                        return (
+                                            <ul>
+                                                <li>
+                                                    <input type="checkbox" key={index}/>{city}
+                                                    <br/>
+                                                </li>
+                                            </ul>
+                                        )
+                                    })
+                                        ) : (
+                                            " "
+                                        )
+                                }
+
+                            </li>
+                            {/*{citiesArray}*/}
+                        </ul>
+                    )
+                })}
             </div>
         );
     }
