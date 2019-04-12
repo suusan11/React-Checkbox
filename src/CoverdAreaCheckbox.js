@@ -5,12 +5,14 @@ import ProvinceCheckbox from "./ProvinceCheckbox";
 
 const moon = new Moon();
 
+const classNames = require('classnames');
+
 class CoveredAreaCheckbox extends Component {
     constructor(props) {
         super(props);
         this.state = {
             provinces: [],
-            isChecked: false
+            isChecked: ''
         };
 
         this.getCities = this.getCities.bind(this);
@@ -81,12 +83,23 @@ class CoveredAreaCheckbox extends Component {
                     this.setState({ provinces: updatedProvinces, }, () => {
                         console.log("🍤" + JSON.stringify(this.state.provinces));
                     })
-
                 })
+
+            const { isChecked } = e.target;
+            this.setState({ isChecked });
 
     };
     ////////////////////////////////////////
 
+    //get class name depend on checked state
+    ////////////////////////////////////////
+    getClassNames = () => {
+        return classNames({
+            'isShow': !this.state.isChecked,
+            'isNotShow': this.state.isChecked
+        });
+    }
+    ////////////////////////////////////////
 
 
 
@@ -116,30 +129,30 @@ class CoveredAreaCheckbox extends Component {
 
                 {this.state.provinces.map((prov, index) => {
                     return (
-                        <ul>
-                            <li>
-                                <input type="checkbox" key={index} value={prov.id} onClick={this.getCities}/>{prov.name}
+                        <div className="coveredarea">
+                            <ul className="input__parent">
+                                <li>
+                                    <input type="checkbox" key={index} value={prov.id} checked={this.state.isChecked} onClick={this.getCities}/>{prov.name}
 
+                                    <ul className={this.getClassNames()}>
+                                    {this.state.isChecked && prov.cities ? (
+                                        prov.cities.map((city, index) => {
 
-                                {prov.cities ? (
-                                    prov.cities.map((city, index) => {
-                                        return (
-                                            <ul>
-                                                <li>
-                                                    <input type="checkbox" key={index}/>{city}
-                                                    <br/>
-                                                </li>
-                                            </ul>
-                                        )
-                                    })
-                                        ) : (
-                                            " "
-                                        )
-                                }
+                                            return (
 
-                            </li>
-                            {/*{citiesArray}*/}
-                        </ul>
+                                                    <li>
+                                                        <input type="checkbox" key={index}/>{city}
+                                                        <br/>
+                                                    </li>
+                                            )
+                                        })
+                                        ) : ( " " )
+                                    }
+                                    </ul>
+
+                                </li>
+                            </ul>
+                        </div>
                     )
                 })}
             </div>
