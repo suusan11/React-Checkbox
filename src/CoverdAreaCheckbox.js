@@ -12,7 +12,7 @@ class CoveredAreaCheckbox extends Component {
         super(props);
         this.state = {
             provinces: [],
-            isChecked: ''
+            isChecked: false
         };
 
         this.getCities = this.getCities.bind(this);
@@ -32,10 +32,6 @@ class CoveredAreaCheckbox extends Component {
                     })
                 }
 
-                // let newProvinceArray = Object.assign({}, this.state.provinces.province);
-                // // newProvinceArray.provinces[key].province = provinces;
-                // newProvinceArray = provinces;
-
                 this.setState({ provinces }, () => {
                     console.log("🐷" + JSON.stringify(this.state.provinces)); //get province info about id and name
                 })
@@ -46,15 +42,16 @@ class CoveredAreaCheckbox extends Component {
         // })
     }
 
-    // componentDidMount() {
-    //     this.getCities()
-    // }
-
     // Get data by Province
     ////////////////////////////////////////
     getCities(e){
 
         const provId = e.target.value;
+
+        let isChecked = this.state.isChecked;
+        isChecked = e.target.checked;
+        console.log("🍦" + e.target.checked);
+
             moon
                 .get(`api/area/search/citylist/byareaid/${provId}`)
                 .then(res => {
@@ -80,25 +77,47 @@ class CoveredAreaCheckbox extends Component {
                         }
                     }
 
-                    this.setState({ provinces: updatedProvinces, }, () => {
-                        console.log("🍤" + JSON.stringify(this.state.provinces));
-                    })
+                    // let isChecked = this.state.isChecked;
+                    // isChecked = e.target.checkbox;
+                    if(isChecked === true) {
+                        this.setState({ provinces: updatedProvinces, }, () => {
+                            console.log("🍤" + JSON.stringify(this.state.provinces));
+                        })
+                    }
+
+
                 })
 
-            const { isChecked } = e.target;
-            this.setState({ isChecked });
+            // const { isChecked } = e.target;
+            // this.setState({ isChecked });
 
     };
     ////////////////////////////////////////
 
+
+    //Check checkbox checked
+    ////////////////////////////////////////
+    // checkProv = (e) => {
+    //     let isChecked = this.state.isChecked;
+    //     isChecked = e.target.checkbox;
+    //
+    //     if(isChecked === true) {
+    //         this.setState({ isChecked });
+    //
+    //     }
+    //
+    // }
+    ////////////////////////////////////////
+
+
     //get class name depend on checked state
     ////////////////////////////////////////
-    getClassNames = () => {
-        return classNames({
-            'isShow': !this.state.isChecked,
-            'isNotShow': this.state.isChecked
-        });
-    }
+    // getClassNames = () => {
+    //     return classNames({
+    //         'isShow': !this.state.isChecked,
+    //         'isNotShow': this.state.isChecked
+    //     });
+    // }
     ////////////////////////////////////////
 
 
@@ -132,10 +151,10 @@ class CoveredAreaCheckbox extends Component {
                         <div className="coveredarea">
                             <ul className="input__parent">
                                 <li>
-                                    <input type="checkbox" key={index} value={prov.id} checked={this.state.isChecked} onClick={this.getCities}/>{prov.name}
+                                    <input type="checkbox" key={index} value={prov.id} onClick={this.getCities} onChange={this.checkProv}/>{prov.name}
 
-                                    <ul className={this.getClassNames()}>
-                                    {this.state.isChecked && prov.cities ? (
+                                    <ul>
+                                    {prov.cities ? (
                                         prov.cities.map((city, index) => {
 
                                             return (
