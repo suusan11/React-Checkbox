@@ -13,7 +13,8 @@ class CoveredAreaCheckbox extends Component {
         this.state = {
             showArea: [],
             checkedArea: [],
-            checkedItems: new Map(),
+            provChecked: new Map(),
+            citiesChecked: new Map()
         };
 
         this.getCities = this.getCities.bind(this);
@@ -50,8 +51,9 @@ class CoveredAreaCheckbox extends Component {
         const provId = e.target.value;
 
         const isChecked = e.target.checked;
-        this.setState(prevState => ({ checkedItems: prevState.checkedItems.set(provId, isChecked) }));
-        console.log("🍖" + [...this.state.checkedItems]);
+        this.setState(prevState => ({ provChecked: prevState.provChecked.set(provId, isChecked) }));
+        console.log("🍖" + [...this.state.provChecked]);
+
 
             moon
                 .get(`api/area/search/citylist/byareaid/${provId}`)
@@ -75,8 +77,17 @@ class CoveredAreaCheckbox extends Component {
 
                         if(provId === updatedProvinces[i].id) {
                             updatedProvinces[i] = Object.assign({}, this.state.showArea[i], { cities });
+
+                            if(isChecked === true) {
+                                this.setState({ citiesChecked: true })
+                                console.log("🍑" + cities + " " + this.state.citiesChecked);
+                            } else {
+                                this.setState({ citiesChecked: false })
+                            }
                         }
                     }
+
+
 
                     this.setState({ showArea: updatedProvinces, }, () => {
                         console.log("🍤" + JSON.stringify(this.state.showArea));
@@ -142,7 +153,7 @@ class CoveredAreaCheckbox extends Component {
                         <div className="coveredarea">
                             <ul className="input__parent">
                                 <li>
-                                    <input type="checkbox" key={index} value={prov.id} checked={this.state.checkedItems.get(prov.id)} onClick={this.getCities} />{prov.name}
+                                    <input type="checkbox" key={index} value={prov.id} checked={this.state.provChecked.get(prov.id)} onClick={this.getCities} />{prov.name}
 
                                     <ul>
                                     {prov.cities ? (
@@ -151,7 +162,7 @@ class CoveredAreaCheckbox extends Component {
                                             return (
 
                                                     <li>
-                                                        <input type="checkbox" key={index} value={city.id} onChange={this.itemChecked}/>{city}
+                                                        <input type="checkbox" key={index} value={city.id} checked={this.state.citiesChecked} onChange={this.itemChecked}/>{city}
                                                         <br/>
                                                     </li>
                                             )
