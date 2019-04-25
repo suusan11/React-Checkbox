@@ -19,90 +19,128 @@ class CoveredAreaCheckbox extends Component {
         const showProvArea = [];
         const showCitiesArea = [];
         const checkedCities = [];
-        let provId = '';
 
         moon
-            .get('api/area/all')
+            .get('api/area/cities/all')
             .then(res => {
 
-                const showProvArea = [];
-                const provData = res.data;
-                console.log(provData);
-                for (const prov of provData) {
+                //get city data
+                for (let i = 0; i < res.data.length; i++) {
 
                     showProvArea.push({
-                        id: prov._id,
-                        name: prov.name
-                    })
+                        id: res.data[i].area_id._id,
+                    });
 
-                    provId = prov._id;
+                    showCitiesArea.push({
+                        city: res.data[i].city,
+                        id: res.data[i].area_id._id,
+                        prov: res.data[i].area_id.name
+                    });
 
+                    const id = res.data[i].area_id._id;
+
+                    checkedCities[id] = new Set();
 
                     // .catch(err => {
                     //     this.disabledInput();
                     //     console.log(JSON.stringify(err));
                     // })
-
                 }
-                console.log("🐥" + provId);
-                this.setState({ provinces: showProvArea, }, () => {
+
+                this.setState({ provinces: showProvArea, cities: showCitiesArea, checkedCities: checkedCities, }, () => {
                     console.log("🐷" + JSON.stringify(this.state.provinces));
+                    console.log("🐶" + JSON.stringify(this.state.cities));
                 })
+
             })
-        console.log("🐥" + provId);
     }
 
 
-    // handleAllChecked = (e) => {
-    //
-    //     const provId = e.target.value;
-    //     const isProvChecked = e.target.checked;
-    //     this.setState(prevState => ({ provChecked: prevState.provChecked.set(provId, isProvChecked) }));
-    //     console.log("🍖" + [...this.state.provChecked]);
-    //
-    //
-    //     console.log("🍊" + this.state.showCitiesArea);
-    //     // if(isProvChecked === true && provId === ) {
-    //     //     this.setState({ citiesChecked: true })
-    //     // }
-    //
-    // }
+    handleChange = (provId) => (event) => {
+
+        const { name } = event.target;
+        const { checkedCities } = this.state;
+        const label = Number(name);
+
+        if (checkedCities[provId].has(label)) {
+            checkedCities[provId].delete(label);
+        } else {
+            checkedCities[provId].add(label);
+        }
+        this.setState({ checkedCities: checkedCities}
+        );
+    };
+
+    handleAllChange = (event) => {
+        const { name, checked } = event.target;
+        const { cities, checkedCities } = this.state;
+
+        if (checked) {
+            for (const city of cities[`city${name}`]) {
+                checkedCities[`city${name}`].add(city._id);
+            }
+        } else {
+            checkedCities[`city${name}`].clear();
+        }
+        this.setState({ checkedCities: checkedCities });
+    };
+
+    send = () => {
+        const { checkedCities } = this.state;
+        let arr = [];
+        Object.keys(checkedCities).forEach((provId) => {
+            arr = arr.concat(Array.from(checkedCities[provId]));
+        });
+        this.setState({ sendCities: arr });
+    };
 
 
     render() {
+        const { provinces, cities, checkedCities } = this.state;
+        const list = [];
 
-        return(
-            <div>
-
-                {this.state.provinces.map((prov, index) => {
-                    return (
-                        <div className="coveredarea">
-                            <ul className="input__parent">
-                                <li>
-                                    <h1>{prov.name}</h1>
-                                    <input type="checkbox" value={prov.id} onClick={this.handleAllChecked}/>all
-
-                                    <ul>
-                                        {prov.cities ? (
-                                            prov.cities.map((city, index) => {
-
-                                                return (
-
-                                                    <li>
-                                                        <input type="checkbox" value={city.id} checked={this.state.citiesChecked}/>{city.name}
-                                                        <br/>
-                                                    </li>
-                                                )
-                                            })
-                                        ) : ( " " )
-                                        }
-                                    </ul>
-
-                                </li>
-                            </ul>
+        for (const prov of provinces) {
+            list.push(
+                <div key={prov.id}>
+                    <h1>{prov.prov}</h1>
+                    <div>
+                        <div>
+                            <input
+                                name={prov.id}
+                                type="checkbox"
+                                checked={checkedCities[`city${prov.id}`].size >= cities[`city${prov.id}`].length}
+                                onChange={this.handleAllChange}
+                            />
+                            <label>all</label>
                         </div>
+                        {
+                            cities[`city${prov.id}`].map((city) => {
+                                return (
+                                    <div key={city._id}>
+                                        <input
+                                            name={city._id}
+                                            type="checkbox"
+                                            checked={checkedCities[`city${prov.id}`].has(city._id)}
+                                            onChange={this.handleChange(prov.id)}
+                                        />
+                                        <label>{city.name}</label>
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
+                </div>
+            )
+        }
+        return (
+            <div className="App">
+                {list}
+                <button onClick={this.send}>送信！</button>
+                <div>{this.state.sendCities.map((cityId) => {
+                    return (
+                        <div>{cityId}</div>
                     )
-                })}
+                })}</div>
             </div>
         );
     }
