@@ -10,6 +10,7 @@ class CoveredAreaCheckbox extends Component {
         this.state = {
             provinces: [],
             cities: [],
+            dataIsSet: false,
             checkedCities: [],
             sendCities: [],
         };
@@ -20,39 +21,117 @@ class CoveredAreaCheckbox extends Component {
         const showCitiesArea = [];
         const checkedCities = [];
 
-        moon
-            .get('api/area/cities/all')
-            .then(res => {
+        let promise1 = moon
+            .get('api/area/all')
+            .then((res) => {
 
-                //get city data
+                //get prov data
                 for (let i = 0; i < res.data.length; i++) {
 
                     showProvArea.push({
-                        id: res.data[i].area_id._id,
+                        id: res.data[i]._id,
+                        name: res.data[i].name
                     });
+
+                    const id = res.data[i]._id;
+                    checkedCities[`city${id}`] = new Set();
+                }
+                this.setState({provinces: showProvArea}, () => {
+                    console.info("🐷" + JSON.stringify(this.state.provinces));
+                });
+            })
+            .catch((err) => {
+                // this.disabledInput();
+                console.error(err);
+
+                throw err;
+            });
+
+        let promise2 = moon
+            .get('api/area/cities/all')
+            .then((res) => {
+                //get city data
+                for(let i = 0; i < res.data.length; i++) {
 
                     showCitiesArea.push({
                         city: res.data[i].city,
-                        id: res.data[i].area_id._id,
+                        cityId: res.data[i]._id,
+                        provId: res.data[i].area_id._id,
                         prov: res.data[i].area_id.name
                     });
-
-                    const id = res.data[i].area_id._id;
-
-                    checkedCities[id] = new Set();
-
-                    // .catch(err => {
-                    //     this.disabledInput();
-                    //     console.log(JSON.stringify(err));
-                    // })
                 }
-
-                this.setState({ provinces: showProvArea, cities: showCitiesArea, checkedCities: checkedCities, }, () => {
-                    console.log("🐷" + JSON.stringify(this.state.provinces));
-                    console.log("🐶" + JSON.stringify(this.state.cities));
-                })
-
+                this.setState({cities: showCitiesArea}, () => {
+                    console.info("🐷" + JSON.stringify(this.state.cities));
+                });
             })
+            .catch((err) => {
+                // this.disabledInput();
+                console.error(err);
+
+                throw err;
+            });
+
+        // const promise1 = moon.get('api/area/all')
+        //     .then((res, resolve) => {
+        //
+        //         //get prov data
+        //         for (let i = 0; i < res.data.length; i++) {
+        //
+        //             showProvArea.push({
+        //                 id: res.data[i]._id,
+        //                 name: res.data[i].name
+        //             });
+        //
+        //             const id = res.data[i]._id;
+        //             checkedCities[`city${id}`] = new Set();
+        //         }
+        //
+        //         this.setState({ provinces: showProvArea, checkedCities: checkedCities, }, () => {
+        //             console.log("🐷" + JSON.stringify(this.state.provinces));
+        //         });
+        //
+        //         return resolve();
+        //     })
+        //
+        //     .catch((err, reject) => {
+        //         // this.disabledInput();
+        //         console.log(JSON.stringify(err));
+        //
+        //         return reject;
+        //     });
+        //
+        // const promise2 = moon.get('api/area/cities/all')
+        //     .then((res, resolve) => {
+        //
+        //         //get city data
+        //         for(let i = 0; i < res.data.length; i++) {
+        //
+        //             showCitiesArea.push({
+        //                 city: res.data[i].city,
+        //                 cityId: res.data[i]._id,
+        //                 provId: res.data[i].area_id._id,
+        //                 prov: res.data[i].area_id.name
+        //             });
+        //         }
+        //
+        //         this.setState({ cities: showCitiesArea, }, () => {
+        //             console.log("🐷" + JSON.stringify(this.state.cities));
+        //         });
+        //
+        //         return resolve();
+        //     })
+        //
+        //     .catch((err, reject) => {
+        //         // this.disabledInput();
+        //         console.log(JSON.stringify(err));
+        //
+        //         return reject;
+        //     });
+
+        Promise.all([promise1, promise2])
+            .then(() => {
+                this.setState({ dataIsSet: true})
+            });
     }
 
 
@@ -71,69 +150,84 @@ class CoveredAreaCheckbox extends Component {
         );
     };
 
-    handleAllChange = (event) => {
-        const { name, checked } = event.target;
-        const { cities, checkedCities } = this.state;
-
-        if (checked) {
-            for (const city of cities[`city${name}`]) {
-                checkedCities[`city${name}`].add(city._id);
-            }
-        } else {
-            checkedCities[`city${name}`].clear();
-        }
-        this.setState({ checkedCities: checkedCities });
-    };
-
-    send = () => {
-        const { checkedCities } = this.state;
-        let arr = [];
-        Object.keys(checkedCities).forEach((provId) => {
-            arr = arr.concat(Array.from(checkedCities[provId]));
-        });
-        this.setState({ sendCities: arr });
-    };
+    // handleAllChange = (event) => {
+    //     const { name, checked } = event.target;
+    //     const { cities, checkedCities } = this.state;
+    //
+    //     if (checked) {
+    //         for (const city of cities[`city${name}`]) {
+    //             checkedCities[`city${name}`].add(city._id);
+    //         }
+    //     } else {
+    //         checkedCities[`city${name}`].clear();
+    //     }
+    //     this.setState({ checkedCities: checkedCities });
+    // };
+    //
+    // send = () => {
+    //     const { checkedCities } = this.state;
+    //     let arr = [];
+    //     Object.keys(checkedCities).forEach((provId) => {
+    //         arr = arr.concat(Array.from(checkedCities[provId]));
+    //     });
+    //     this.setState({ sendCities: arr });
+    // };
 
 
     render() {
-        const { provinces, cities, checkedCities } = this.state;
-        const list = [];
+        const { provinces, cities, dataIsSet, checkedCities } = this.state;
 
-        for (const prov of provinces) {
-            list.push(
-                <div key={prov.id}>
-                    <h1>{prov.prov}</h1>
-                    <div>
+        console.info("is data set? :", dataIsSet);
+        console.info("provinces: ", provinces);
+        console.info("cities: ", cities);
+
+        const list = dataIsSet ?
+            provinces.map((areaValue, areaIndex, areaArray) => {
+                console.info(areaValue);
+
+                // the reason of possible error
+                console.info("city: ", cities[`city${areaValue.id}`]);  // => undefined
+
+                return (
+                      <div key={areaIndex}>
+                        <h1>{areaValue.name}</h1>
                         <div>
-                            <input
-                                name={prov.id}
-                                type="checkbox"
-                                checked={checkedCities[`city${prov.id}`].size >= cities[`city${prov.id}`].length}
-                                onChange={this.handleAllChange}
-                            />
-                            <label>all</label>
+                            <div>
+                                <input
+                                    name={areaValue._id}
+                                    type="checkbox"
+                                    // checked={checkedCities[`city${prov.provId}`].size >= cities[`city${prov.provId}`].length}
+                                    // onChange={this.handleAllChange}
+                                />
+                                <label>all</label>
+                            </div>
+                            {
+                                cities[`city${areaValue.id}`].map((cityValue,cityIndex,cityArray) => {
+                                    if(cityValue.prov === areaValue.name) {
+                                        return (
+                                            <div key={cityIndex}>
+                                                <input
+                                                    name={cityValue.cityId}
+                                                    type="checkbox"
+                                                    checked={checkedCities[`city${areaValue.id}`].has(cityValue.cityId)}
+                                                    onChange={this.handleChange(areaValue.id)}
+                                                />
+                                                <label>{cityValue.city}</label>
+                                            </div>
+                                        )
+                                    }
+
+                                })
+                            }
                         </div>
-                        {
-                            cities[`city${prov.id}`].map((city) => {
-                                return (
-                                    <div key={city._id}>
-                                        <input
-                                            name={city._id}
-                                            type="checkbox"
-                                            checked={checkedCities[`city${prov.id}`].has(city._id)}
-                                            onChange={this.handleChange(prov.id)}
-                                        />
-                                        <label>{city.name}</label>
-                                    </div>
-                                )
-                            })
-                        }
                     </div>
-                </div>
-            )
-        }
+                )
+            })
+            :
+            <div>Spinner</div>
+
         return (
-            <div className="App">
+            <div>
                 {list}
                 <button onClick={this.send}>送信！</button>
                 <div>{this.state.sendCities.map((cityId) => {
