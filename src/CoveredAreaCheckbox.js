@@ -22,7 +22,7 @@ class CoveredAreaCheckbox extends Component {
         const checkedCities = [];
         let id = '';
 
-        let promise1 = moon
+        const promise1 = moon
             .get('api/area/all')
             .then((res) => {
 
@@ -48,25 +48,26 @@ class CoveredAreaCheckbox extends Component {
                 throw err;
             });
 
-        let promise2 = moon
+        const promise2 = moon
             .get('api/area/cities/all')
             .then((res) => {
                 //get city data
                 for(let i = 0; i < res.data.length; i++) {
-
-                    showCitiesArea.push({
-                        city: res.data[i].city,
-                        cityId: res.data[i]._id,
-                        provId: res.data[i].area_id._id,
-                        prov: res.data[i].area_id.name
-                    });
+                    let obj = {};
+                        obj['city'] = res.data[i].city;
+                        obj['cityId'] = res.data[i]._id;
+                        obj['provId'] = res.data[i].area_id._id;
+                        obj['prov'] = res.data[i].area_id.name;
+                    showCitiesArea.push(obj);
                 }
+
+                showCitiesArea[`city${id}`] = showCitiesArea[id];
 
                 this.setState({cities: showCitiesArea}, () => {
                     console.info("🐷" + JSON.stringify(this.state.cities));
                 });
 
-                showCitiesArea[`city${id}`] = showCitiesArea[id];
+
             })
             .catch((err) => {
                 // this.disabledInput();
@@ -75,62 +76,6 @@ class CoveredAreaCheckbox extends Component {
                 throw err;
             });
 
-        // const promise1 = moon.get('api/area/all')
-        //     .then((res, resolve) => {
-        //
-        //         //get prov data
-        //         for (let i = 0; i < res.data.length; i++) {
-        //
-        //             showProvArea.push({
-        //                 id: res.data[i]._id,
-        //                 name: res.data[i].name
-        //             });
-        //
-        //             const id = res.data[i]._id;
-        //             checkedCities[`city${id}`] = new Set();
-        //         }
-        //
-        //         this.setState({ provinces: showProvArea, checkedCities: checkedCities, }, () => {
-        //             console.log("🐷" + JSON.stringify(this.state.provinces));
-        //         });
-        //
-        //         return resolve();
-        //     })
-        //
-        //     .catch((err, reject) => {
-        //         // this.disabledInput();
-        //         console.log(JSON.stringify(err));
-        //
-        //         return reject;
-        //     });
-        //
-        // const promise2 = moon.get('api/area/cities/all')
-        //     .then((res, resolve) => {
-        //
-        //         //get city data
-        //         for(let i = 0; i < res.data.length; i++) {
-        //
-        //             showCitiesArea.push({
-        //                 city: res.data[i].city,
-        //                 cityId: res.data[i]._id,
-        //                 provId: res.data[i].area_id._id,
-        //                 prov: res.data[i].area_id.name
-        //             });
-        //         }
-        //
-        //         this.setState({ cities: showCitiesArea, }, () => {
-        //             console.log("🐷" + JSON.stringify(this.state.cities));
-        //         });
-        //
-        //         return resolve();
-        //     })
-        //
-        //     .catch((err, reject) => {
-        //         // this.disabledInput();
-        //         console.log(JSON.stringify(err));
-        //
-        //         return reject;
-        //     });
 
         Promise.all([promise1, promise2])
             .then(() => {
@@ -190,7 +135,7 @@ class CoveredAreaCheckbox extends Component {
                 console.info(areaValue);
 
                 // the reason of possible error
-                console.info("city: ", cities[`city${areaValue.id}`]);  // => undefined
+                console.info("city: ", cities[areaIndex]);  // => undefined
 
                 return (
                       <div key={areaIndex}>
@@ -213,7 +158,7 @@ class CoveredAreaCheckbox extends Component {
                                                 <input
                                                     name={cityValue.cityId}
                                                     type="checkbox"
-                                                    checked={checkedCities[`city${areaValue.id}`].has(cityValue.cityId)}
+                                                    // checked={checkedCities[`city${areaValue.id}`].has(cityValue.cityId)}
                                                     onChange={this.handleChange(areaValue.id)}
                                                 />
                                                 <label>{cityValue.city}</label>
