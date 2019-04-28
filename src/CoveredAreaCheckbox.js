@@ -20,6 +20,7 @@ class CoveredAreaCheckbox extends Component {
         const showProvArea = [];
         const showCitiesArea = [];
         const checkedCities = [];
+        let id = '';
 
         let promise1 = moon
             .get('api/area/all')
@@ -33,7 +34,7 @@ class CoveredAreaCheckbox extends Component {
                         name: res.data[i].name
                     });
 
-                    const id = res.data[i]._id;
+                    id = res.data[i]._id;
                     checkedCities[`city${id}`] = new Set();
                 }
                 this.setState({provinces: showProvArea}, () => {
@@ -60,9 +61,12 @@ class CoveredAreaCheckbox extends Component {
                         prov: res.data[i].area_id.name
                     });
                 }
+
                 this.setState({cities: showCitiesArea}, () => {
                     console.info("🐷" + JSON.stringify(this.state.cities));
                 });
+
+                showCitiesArea[`city${id}`] = showCitiesArea[id];
             })
             .catch((err) => {
                 // this.disabledInput();
