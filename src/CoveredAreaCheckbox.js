@@ -18,6 +18,7 @@ class CoveredAreaCheckbox extends Component {
 
     componentDidMount() {
         const showProvArea = [];
+        let stockCitiesArea = [];
         const showCitiesArea = [];
         const checkedCities = [];
         let id = '';
@@ -37,6 +38,7 @@ class CoveredAreaCheckbox extends Component {
                     id = res.data[i]._id;
                     checkedCities[`city${id}`] = new Set();
                 }
+                console.log("nani" +checkedCities);
                 this.setState({provinces: showProvArea}, () => {
                     console.info("🐷" + JSON.stringify(this.state.provinces));
                 });
@@ -51,6 +53,20 @@ class CoveredAreaCheckbox extends Component {
         const promise2 = moon
             .get('api/area/cities/all')
             .then((res) => {
+                const NT = [];
+                const YT = [];
+                const NU = [];
+                const ON = [];
+                const QC = [];
+                const BC = [];
+                const MB = [];
+                const NB = [];
+                const PE = [];
+                const NS = [];
+                const NF = [];
+                const SK = [];
+                const AB = [];
+
                 //get city data
                 for(let i = 0; i < res.data.length; i++) {
                     let obj = {};
@@ -58,12 +74,39 @@ class CoveredAreaCheckbox extends Component {
                         obj['cityId'] = res.data[i]._id;
                         obj['provId'] = res.data[i].area_id._id;
                         obj['prov'] = res.data[i].area_id.name;
-                    showCitiesArea.push(obj);
+                        if(obj['provId'] === '5c9293ff71ab0b07e8c61c38') {
+                            NT.push(obj)
+                        }else if(obj['provId'] === '5c9293ff71ab0b07e8c61c39') {
+                            YT.push(obj)
+                        }else if(obj['provId'] === '5c9293ff71ab0b07e8c61c3a') {
+                            NU.push(obj)
+                        }else if(obj['provId'] === '5c9293ff71ab0b07e8c61c3b') {
+                            ON.push(obj)
+                        }else if(obj['provId'] === '5c9293ff71ab0b07e8c61c3d') {
+                            QC.push(obj)
+                        }else if(obj['provId'] === '5c9293ff71ab0b07e8c61c3c') {
+                            BC.push(obj)
+                        }else if(obj['provId'] === '5c9293ff71ab0b07e8c61c40') {
+                            MB.push(obj)
+                        }else if(obj['provId'] === '5c9293ff71ab0b07e8c61c3f') {
+                            NB.push(obj)
+                        }else if(obj['provId'] === '5c9293ff71ab0b07e8c61c41') {
+                            PE.push(obj)
+                        }else if(obj['provId'] === '5c9293ff71ab0b07e8c61c3e') {
+                            NS.push(obj)
+                        }else if(obj['provId'] === '5c9293ff71ab0b07e8c61c44') {
+                            NF.push(obj)
+                        }else if(obj['provId'] === '5c9293ff71ab0b07e8c61c42') {
+                            SK.push(obj)
+                        }else {
+                            AB.push(obj)
+                        }
+                    stockCitiesArea = [NT, YT, NU, ON, QC, BC, MB, NB, PE, NS, NF, SK, AB];
                 }
 
-                showCitiesArea[`city${id}`] = showCitiesArea[id];
+                showCitiesArea[`city${id}`] = stockCitiesArea[id];
 
-                this.setState({cities: showCitiesArea}, () => {
+                this.setState({cities: stockCitiesArea}, () => {
                     console.info("🐷" + JSON.stringify(this.state.cities));
                 });
 
@@ -131,12 +174,11 @@ class CoveredAreaCheckbox extends Component {
         console.info("cities: ", cities);
 
         const list = dataIsSet ?
-            provinces.map((areaValue, areaIndex, areaArray) => {
+            provinces.map((areaValue, areaIndex) => {
                 console.info(areaValue);
 
                 // the reason of possible error
                 console.info("city: ", cities[areaIndex]);  // => undefined
-
                 return (
                       <div key={areaIndex}>
                         <h1>{areaValue.name}</h1>
@@ -150,22 +192,25 @@ class CoveredAreaCheckbox extends Component {
                                 />
                                 <label>all</label>
                             </div>
+
+
                             {
-                                cities[`city${areaValue.id}`].map((cityValue,cityIndex,cityArray) => {
-                                    if(cityValue.prov === areaValue.name) {
+                                cities[`city${areaValue.id}`].map((cityValue,cityIndex) => {
+                                     {
+                                         if(cityValue.prov === areaValue.name)
+                                         console.info("nani " + checkedCities[areaValue.id]);
                                         return (
                                             <div key={cityIndex}>
                                                 <input
                                                     name={cityValue.cityId}
                                                     type="checkbox"
-                                                    // checked={checkedCities[`city${areaValue.id}`].has(cityValue.cityId)}
+                                                    checked={checkedCities[areaValue.id].has(cityValue.cityId)}
                                                     onChange={this.handleChange(areaValue.id)}
                                                 />
                                                 <label>{cityValue.city}</label>
                                             </div>
                                         )
                                     }
-
                                 })
                             }
                         </div>
