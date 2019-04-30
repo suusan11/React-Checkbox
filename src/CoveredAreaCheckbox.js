@@ -21,7 +21,6 @@ class CoveredAreaCheckbox extends Component {
         let stockCitiesArea = [];
         const showCitiesArea = [];
         const checkedCities = [];
-        let id = '';
 
         const promise1 = moon
             .get('api/area/all')
@@ -35,8 +34,7 @@ class CoveredAreaCheckbox extends Component {
                         name: res.data[i].name
                     });
 
-                    id = res.data[i]._id;
-                    checkedCities[`city${id}`] = new Set();
+                    // checkedCities[`city${id}`] = new Set();
                 }
                 console.log("nani" +checkedCities);
                 this.setState({provinces: showProvArea}, () => {
@@ -104,13 +102,20 @@ class CoveredAreaCheckbox extends Component {
                     stockCitiesArea = [NT, YT, NU, ON, QC, BC, MB, NB, PE, NS, NF, SK, AB];
                 }
 
-                showCitiesArea[`city${id}`] = stockCitiesArea[id];
+                for(let i = 0; i < stockCitiesArea.length; i++) {
+                    const id =  res.data[i].area_id._id;
+                    const array1 = stockCitiesArea[i];
 
-                this.setState({cities: stockCitiesArea}, () => {
+                    for(let j = 0; j < array1.length; j++) {
+                        const array2 = array1[j].provId;
+                        showCitiesArea[id] = array2;
+                    }
+                }
+
+                console.log("🐳" + showCitiesArea);
+                this.setState({cities: showCitiesArea}, () => {
                     console.info("🐷" + JSON.stringify(this.state.cities));
                 });
-
-
             })
             .catch((err) => {
                 // this.disabledInput();
@@ -195,7 +200,8 @@ class CoveredAreaCheckbox extends Component {
 
 
                             {
-                                cities[`city${areaValue.id}`].map((cityValue,cityIndex) => {
+                                cities.map((cityValue,cityIndex) => {
+                                    console.log("🦄" + JSON.stringify(cityValue));
                                      {
                                          if(cityValue.prov === areaValue.name)
                                          console.info("nani " + checkedCities[areaValue.id]);
@@ -204,10 +210,10 @@ class CoveredAreaCheckbox extends Component {
                                                 <input
                                                     name={cityValue.cityId}
                                                     type="checkbox"
-                                                    checked={checkedCities[areaValue.id].has(cityValue.cityId)}
+                                                    // checked={checkedCities[areaValue.id].has(cityValue.cityId)}
                                                     onChange={this.handleChange(areaValue.id)}
                                                 />
-                                                <label>{cityValue.city}</label>
+                                                <label>{cityValue[cityIndex].city}</label>
                                             </div>
                                         )
                                     }
