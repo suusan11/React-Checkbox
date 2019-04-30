@@ -34,8 +34,7 @@ class CoveredAreaCheckbox extends Component {
                         name: res.data[i].name
                     });
 
-                    const id = res.data[i]._id;
-                    checkedCities[id] = new Set();
+                    checkedCities[i] = new Set();
                 }
 
                 this.setState({provinces: showProvArea, checkedCities: checkedCities, }, () => {
@@ -103,15 +102,6 @@ class CoveredAreaCheckbox extends Component {
                     stockCitiesArea = [NT, YT, NU, ON, QC, BC, MB, NB, PE, NS, NF, SK, AB];
                 }
 
-                // for(let i = 0; i < stockCitiesArea.length; i++) {
-                //     const id =  res.data[i].area_id._id;
-                //     const array1 = stockCitiesArea[i];
-                //
-                //     for(let j = 0; j < array1.length; j++) {
-                //         const array2 = array1[j].provId;
-                //         showCitiesArea[id] = array2;
-                //     }
-                // }
                 console.log("🍋" + stockCitiesArea[0][0]['provId']);
                 this.setState({cities: stockCitiesArea}, () => {
                     console.info("🐷" + JSON.stringify(this.state.cities));
@@ -132,31 +122,33 @@ class CoveredAreaCheckbox extends Component {
     }
 
 
-    handleChange = (provId) => (event) => {
+    handleChange = (provIndex) => (event) => {
 
         const { name } = event.target;
         const { checkedCities } = this.state;
-        const label = Number(name);
+        // const label = Number(name);
 
-        if (checkedCities[provId].has(label)) {
-            checkedCities[provId].delete(label);
+        if (checkedCities[provIndex].has(name)) {
+            checkedCities[provIndex].delete(name);
         } else {
-            checkedCities[provId].add(label);
+            checkedCities[provIndex].add(name);
         }
         this.setState({ checkedCities: checkedCities}
         );
+        console.log(checkedCities[provIndex]);
     };
 
     handleAllChange = (event) => {
         const { name, checked } = event.target;
+        const provIndex = Number(name);//文字列を数字にかえる
         const { cities, checkedCities } = this.state;
 
         if (checked) {
-            for (const city of cities[`city${name}`]) {
-                checkedCities[`city${name}`].add(city._id);
+            for (const city of cities[provIndex]) {
+                checkedCities[provIndex].add(city.cityId);
             }
         } else {
-            checkedCities[`city${name}`].clear();
+            checkedCities[provIndex].clear();
         }
         this.setState({ checkedCities: checkedCities });
     };
@@ -182,19 +174,19 @@ class CoveredAreaCheckbox extends Component {
             provinces.map((areaValue, areaIndex) => {
                 console.info(areaValue);
 
-                // the reason of possible error
-                console.info("city: ", cities[areaIndex]);  // => undefined
+                // console.info("city: ", cities[areaIndex]);
                 // console.log("🥕" + JSON.stringify(cities[areaIndex]));
                 // console.log("🥕" + checkedCities[areaValue.id]);
+
                 return (
                       <div key={areaIndex}>
                         <h1>{areaValue.name}</h1>
                         <div>
                             <div>
                                 <input
-                                    name={areaValue.id}
+                                    name={areaIndex}
                                     type="checkbox"
-                                    checked={checkedCities[areaValue.id].size >= cities[areaIndex].length}
+                                    checked={checkedCities[areaIndex].size >= cities[areaIndex].length}
                                     onChange={this.handleAllChange}
                                 />
                                 <label>all</label>
@@ -206,15 +198,13 @@ class CoveredAreaCheckbox extends Component {
                                     // console.log("🍉" + cityValue.prov); // => it'll show prov name
                                     // console.log("🥞" + areaValue.name); // => it'll show prov name
                                      {
-                                         if(cityValue.prov === areaValue.name)
-                                         // console.info("nani " + checkedCities[areaValue.id]);
                                         return (
                                             <div key={cityIndex}>
                                                 <input
                                                     name={cityValue.cityId}
                                                     type="checkbox"
-                                                    checked={checkedCities[areaValue.id].has(cityValue.cityId)}
-                                                    onChange={this.handleChange(areaValue.id)}
+                                                    checked={checkedCities[areaIndex].has(cityValue.cityId)}
+                                                    onChange={this.handleChange(areaIndex)}//属してるプロヴィンス
                                                 />
                                                 <label>{cityValue.city}</label>
                                             </div>
