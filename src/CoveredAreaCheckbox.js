@@ -18,8 +18,7 @@ class CoveredAreaCheckbox extends Component {
 
     componentDidMount() {
         const showProvArea = [];
-        let stockCitiesArea = [];
-        const showCitiesArea = [];
+        let showCitiesArea = [];
         const checkedCities = [];
 
         const promise1 = moon
@@ -99,11 +98,10 @@ class CoveredAreaCheckbox extends Component {
                         }else {
                             AB.push(obj)
                         }
-                    stockCitiesArea = [NT, YT, NU, ON, QC, BC, MB, NB, PE, NS, NF, SK, AB];
+                    showCitiesArea = [NT, YT, NU, ON, QC, BC, MB, NB, PE, NS, NF, SK, AB];
                 }
 
-                console.log("🍋" + stockCitiesArea[0][0]['provId']);
-                this.setState({cities: stockCitiesArea}, () => {
+                this.setState({cities: showCitiesArea}, () => {
                     console.info("🐷" + JSON.stringify(this.state.cities));
                 });
             })
@@ -126,7 +124,6 @@ class CoveredAreaCheckbox extends Component {
 
         const { name } = event.target;
         const { checkedCities } = this.state;
-        // const label = Number(name);
 
         if (checkedCities[provIndex].has(name)) {
             checkedCities[provIndex].delete(name);
@@ -140,7 +137,7 @@ class CoveredAreaCheckbox extends Component {
 
     handleAllChange = (event) => {
         const { name, checked } = event.target;
-        const provIndex = Number(name);//文字列を数字にかえる
+        const provIndex = Number(name);//convert to number
         const { cities, checkedCities } = this.state;
 
         if (checked) {
@@ -204,7 +201,7 @@ class CoveredAreaCheckbox extends Component {
                                                     name={cityValue.cityId}
                                                     type="checkbox"
                                                     checked={checkedCities[areaIndex].has(cityValue.cityId)}
-                                                    onChange={this.handleChange(areaIndex)}//属してるプロヴィンス
+                                                    onChange={this.handleChange(areaIndex)}//belonging province
                                                 />
                                                 <label>{cityValue.city}</label>
                                             </div>
@@ -222,7 +219,7 @@ class CoveredAreaCheckbox extends Component {
         return (
             <div>
                 {list}
-                <button onClick={this.send}>送信！</button>
+                <button onClick={this.send}>Send！</button>
                 <div>{this.state.sendCities.map((cityId) => {
                     return (
                         <div>{cityId}</div>
