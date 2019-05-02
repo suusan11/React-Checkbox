@@ -178,8 +178,8 @@ class CoveredAreaCheckbox extends Component {
                 return (
                       <div key={areaIndex}>
                         <h1>{areaValue.name}</h1>
-                        <div>
-                            <div>
+                        <div className="coveredarea__container">
+                            <div className="input-all">
                                 <input
                                     name={areaIndex}
                                     type="checkbox"
@@ -189,6 +189,7 @@ class CoveredAreaCheckbox extends Component {
                                 <label>all</label>
                             </div>
 
+                            <div className="city__container">
                             {
                                 cities[areaIndex].map((cityValue,cityIndex) => {
                                     // console.log("🦄" + JSON.stringify(cityValue));
@@ -196,7 +197,7 @@ class CoveredAreaCheckbox extends Component {
                                     // console.log("🥞" + areaValue.name); // => it'll show prov name
                                      {
                                         return (
-                                            <div key={cityIndex}>
+                                            <div key={cityIndex} className="city__item">
                                                 <input
                                                     name={cityValue.cityId}
                                                     type="checkbox"
@@ -209,6 +210,7 @@ class CoveredAreaCheckbox extends Component {
                                     }
                                 })
                             }
+                            </div>
                         </div>
                     </div>
                 )
